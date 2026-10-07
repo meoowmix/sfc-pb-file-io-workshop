@@ -1,4 +1,4 @@
-import json
+import json, io
 
 """
 Note: This is designed to hold a list of contacts as a list of dictionaries.
@@ -14,32 +14,36 @@ class ContactManager:
     def __init__(self, file="data.json"):
         self.file = file
         self.contacts = []
+        self.load_contacts
 
     def load_contacts(self):
-        """Loads contacts from a JSON file and converts them to a list of
-        dictionaries
-
-        Bonus: What should happen if the file isn't there?
-                What should happen if the file has invalid JSON in it?
-        """
-        return []
+        with io.open(self.file, 'r') as file:
+             self.contacts = json.load(file)
+        # if self.contacts == []:
+        #     return print("No Contacts")
+        # else:
+        return self.contacts
 
     def add_contact(self, contact):
-        """Adds a contact to the list, and saves the file"""
-        pass
+        self.contacts.append(contact)
+        self.save_contacts()
+        print("Contact Added")
 
     def update_contact(self, contact_to_update):
-        """
-        Updates a contact an saves the file
-
-        Bonus: What happens when the id doesn't exist?
-        """
-        pass
+        self.delete_contact(contact_to_update.get("id"))
+        self.contacts.append(contact_to_update)
+        self.save_contacts()
+        print(f"Contact #{contact_to_update.get('id')} Updated")
 
     def delete_contact(self, id_to_delete):
-        """
-        Deletes a contact and saves the file
+        keep = []
+        for contact in self.contacts:
+            if contact['id'] != id_to_delete:
+                keep.append(contact)
+        self.contacts = keep
+        self.save_contacts()
+        print(f"Deleting Contact #{id_to_delete}")
 
-        Bonus: What happens when the id doesn't exist?
-        """
-        pass
+    def save_contacts(self):
+        with io.open(self.file, 'w') as file:
+            json.dump(self.contacts, file)
